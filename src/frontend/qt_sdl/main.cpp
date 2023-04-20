@@ -100,6 +100,7 @@
 
 #include "CLI.h"
 
+#include "LuaMain.h"
 // TODO: uniform variable spelling
 
 const QString NdsRomMimeType = "application/x-nintendo-ds-rom";
@@ -155,6 +156,7 @@ bool RunningSomething;
 
 MainWindow* mainWindow;
 EmuThread* emuThread;
+LuaThread* luaThread = nullptr;
 
 int autoScreenSizing = 0;
 
@@ -885,6 +887,8 @@ void EmuThread::run()
                 ContextRequest = 0;
             }
         }
+        //luaScript
+        emit luaUpdate();
     }
 
     EmuStatus = 0;
@@ -1749,6 +1753,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 
         menu->addSeparator();
 
+        actLuaScript = menu->addAction("Lua Script");
+        connect(actLuaScript,&QAction::triggered,this,&MainWindow::onOpenLuaScript);
+
+        menu->addSeparator();
+
         actEnableCheats = menu->addAction("Enable cheats");
         actEnableCheats->setCheckable(true);
         connect(actEnableCheats, &QAction::triggered, this, &MainWindow::onEnableCheats);
@@ -2106,6 +2115,7 @@ void MainWindow::createScreenPanel()
     }
     setCentralWidget(panelWidget);
 
+    LuaScript::panel = panelWidget;//So LuaScript can track mouse pos.
     connect(this, SIGNAL(screenLayoutChange()), panelWidget, SLOT(onScreenLayoutChanged()));
     emit screenLayoutChange();
 }
@@ -2728,6 +2738,14 @@ void MainWindow::onEjectGBACart()
     updateCartInserted(true);
 }
 
+void MainWindow::onLuaSaveState(QString filename)
+{
+    emuThread->emuPause();
+    ROMManager::SaveState(filename.toStdString());
+    printf("StateSavedTo: %s",filename.toStdString().c_str());
+    emuThread->emuUnpause();
+}
+
 void MainWindow::onSaveState()
 {
     int slot = ((QAction*)sender())->data().toInt();
@@ -2769,6 +2787,13 @@ void MainWindow::onSaveState()
         OSD::AddMessage(0xFFA0A0, "State save failed");
     }
 
+    emuThread->emuUnpause();
+}
+
+void MainWindow::onLuaLoadState(QString filename)
+{
+    emuThread->emuPause();
+    ROMManager::LoadState(filename.toStdString());
     emuThread->emuUnpause();
 }
 
@@ -3034,6 +3059,27 @@ void MainWindow::onOpenPowerManagement()
 {
     PowerManagementDialog* dlg = PowerManagementDialog::openDlg(this);
 }
+
+void MainWindow::onOpenLuaScript()
+{
+    LuaScript::LuaDialog = new LuaConsoleDialog();
+    LuaScript::LuaDialog->show();
+    connect(LuaScript::LuaDialog,&LuaConsoleDialog::signalNewLua,this,&MainWindow::onLuaStart);
+}
+
+void MainWindow::onLuaStart()
+{
+    if (luaThread==nullptr)
+        return;
+    connect(luaThread,SIGNAL(signalChangeScreenLayout()),this,SLOT(onLuaChangeScreenLayout()));
+    connect(luaThread,SIGNAL(signalDialogFunction()),this,SLOT(onLuaDialogFunction()));
+    connect(luaThread,SIGNAL(signalStartDialog()),this,SLOT(onLuaStartDialog()));
+    connect(luaThread,SIGNAL(signalStateSave(QString)),this,SLOT(onLuaSaveState(QString)));
+    connect(luaThread,SIGNAL(signalStateLoad(QString)),this,SLOT(onLuaLoadState(QString)));
+    connect(emuThread,&EmuThread::luaUpdate,luaThread,&LuaThread::luaUpdate);
+    luaThread->start();
+}
+
 
 void MainWindow::onOpenInputConfig()
 {

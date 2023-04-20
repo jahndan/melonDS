@@ -89,6 +89,9 @@ signals:
 
     void syncVolumeLevel();
 
+    void luaUpdate();
+    void luaDraw();
+
 private:
     void drawScreenGL();
     void initOpenGL();
@@ -272,7 +275,9 @@ private slots:
     void onInsertGBACart();
     void onInsertGBAAddon();
     void onEjectGBACart();
+    void onLuaSaveState(QString filename);
     void onSaveState();
+    void onLuaLoadState(QString filename);
     void onLoadState();
     void onUndoStateLoad();
     void onImportSavefile();
@@ -293,6 +298,8 @@ private slots:
     void onOpenEmuSettings();
     void onEmuSettingsDialogFinished(int res);
     void onOpenPowerManagement();
+    void onOpenLuaScript();
+    void onLuaStart();
     void onOpenInputConfig();
     void onInputConfigFinished(int res);
     void onOpenVideoSettings();
@@ -392,6 +399,7 @@ public:
     QAction* actPreferences;
 #endif
     QAction* actPowerManagement;
+    QAction* actLuaScript;
     QAction* actInputConfig;
     QAction* actVideoSettings;
     QAction* actCameraSettings;
