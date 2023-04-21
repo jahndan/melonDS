@@ -9,6 +9,9 @@
 
 #include <QPainter>
 
+#include <SDL_joystick.h>
+#include "Input.h"
+
 using namespace LuaScript;
 
 LuaConsoleDialog* LuaScript::LuaDialog=nullptr;
@@ -564,6 +567,17 @@ int Lua_fillrect(lua_State* L)
 }
 AddLuaFunction(Lua_fillrect,fillRect);
 
-
+int Lua_keystrokes(lua_State* L)
+{
+    lua_createtable(L,0,Input::Keystrokes.size());
+    for (int i=0; i<Input::Keystrokes.size(); i++)
+    {
+        lua_pushinteger(L,Input::Keystrokes.at(i));
+        lua_seti(L,-2,i);
+    }
+    Input::Keystrokes.clear();
+    return 1;
+}
+AddLuaFunction(Lua_keystrokes,Keys);
 }
 
