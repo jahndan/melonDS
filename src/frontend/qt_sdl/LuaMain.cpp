@@ -28,7 +28,7 @@ LuaConsoleDialog::LuaConsoleDialog(QWidget* parent)
     buttonStartStop->setGeometry(101,0,100,20);
     buttonOpenScript = new QPushButton("OpenLuaFile",this);
     buttonOpenScript->setGeometry(202,0,100,20);
-    connect(buttonOpenScript,&QPushButton::clicked,this,LuaConsoleDialog::onOpenScript);
+    connect(buttonOpenScript,&QPushButton::clicked,this,&LuaConsoleDialog::onOpenScript);
     this->setWindowTitle("Lua Script");
 }
 
@@ -46,12 +46,12 @@ void LuaConsoleDialog::onOpenScript()
         LuaScript::LuaOverlays.clear();
     }
     luaThread = new LuaThread();
-    connect(luaThread,LuaThread::signalPrint,console,LuaConsole::onGetText);
-    connect(luaThread,LuaThread::signalClearConsole,console,LuaConsole::onClear);
-    connect(buttonPausePlay,&QPushButton::clicked,luaThread,LuaThread::luaTogglePause);
-    connect(buttonStartStop,&QPushButton::clicked,luaThread,LuaThread::luaStop);
-    connect(buttonStartStop,&QPushButton::clicked,this,LuaConsoleDialog::onStartStop);
-    connect(this,&LuaConsoleDialog::signalClosing,luaThread,LuaThread::luaStop);
+    connect(luaThread,&LuaThread::signalPrint,console,&LuaConsole::onGetText);
+    connect(luaThread,&LuaThread::signalClearConsole,console,&LuaConsole::onClear);
+    connect(buttonPausePlay,&QPushButton::clicked,luaThread,&LuaThread::luaTogglePause);
+    connect(buttonStartStop,&QPushButton::clicked,luaThread,&LuaThread::luaStop);
+    connect(buttonStartStop,&QPushButton::clicked,this,&LuaConsoleDialog::onStartStop);
+    connect(this,&LuaConsoleDialog::signalClosing,luaThread,&LuaThread::luaStop);
     emit signalNewLua();
 }
 
