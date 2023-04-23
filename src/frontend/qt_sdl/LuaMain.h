@@ -6,9 +6,8 @@
 #include <QPlainTextEdit>
 #include <QFileInfo>
 #include <QPushButton>
-#include <lua-5.4.4/src/lua.hpp>
+#include <lua/lua.hpp>
 #include <QThread>
-
 
 class LuaConsole: public QPlainTextEdit
 {
