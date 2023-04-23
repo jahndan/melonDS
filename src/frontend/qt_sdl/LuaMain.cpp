@@ -37,7 +37,7 @@ LuaConsoleDialog::LuaConsoleDialog(QWidget* parent)
 
 void LuaConsoleDialog::onOpenScript()
 {
-    QFileInfo file = QFileDialog::getOpenFileName(this, "Load Lua Script",QDir::currentPath());
+    QFileInfo file = QFileInfo(QFileDialog::getOpenFileName(this, "Load Lua Script",QDir::currentPath()));
     if (!file.exists())
         return;
     currentScript=file;
