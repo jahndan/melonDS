@@ -63,6 +63,9 @@ public:
     void initContext();
     void deinitContext();
 
+    void onLuaPrint(QString string);
+    void onLuaClearConsole();
+
     int FrontBuffer = 0;
     QMutex FrontBufferLock;
 
@@ -90,7 +93,8 @@ signals:
     void syncVolumeLevel();
 
     void luaUpdate();
-    void luaDraw();
+    void signalLuaPrint(QString);
+    void signalLuaClearConsole();
 
 private:
     void drawScreenGL();
@@ -299,7 +303,6 @@ private slots:
     void onEmuSettingsDialogFinished(int res);
     void onOpenPowerManagement();
     void onOpenLuaScript();
-    void onLuaStart();
     void onOpenInputConfig();
     void onInputConfigFinished(int res);
     void onOpenVideoSettings();

@@ -156,7 +156,6 @@ bool RunningSomething;
 
 MainWindow* mainWindow;
 EmuThread* emuThread;
-LuaThread* luaThread = nullptr;
 
 int autoScreenSizing = 0;
 
@@ -888,7 +887,8 @@ void EmuThread::run()
             }
         }
         //luaScript
-        emit luaUpdate();
+        LuaScript::createLuaState();
+        LuaScript::luaUpdate(); //run _Update
     }
 
     EmuStatus = 0;
@@ -3062,24 +3062,11 @@ void MainWindow::onOpenPowerManagement()
 
 void MainWindow::onOpenLuaScript()
 {
-    LuaScript::LuaDialog = new LuaConsoleDialog();
-    LuaScript::LuaDialog->show();
-    connect(LuaScript::LuaDialog,&LuaConsoleDialog::signalNewLua,this,&MainWindow::onLuaStart);
-}
-
-void MainWindow::onLuaStart()
-{
-    if (luaThread==nullptr)
+    if (LuaScript::LuaDialog) // only one at a time.
         return;
-    connect(luaThread,SIGNAL(signalChangeScreenLayout()),this,SLOT(onLuaChangeScreenLayout()));
-    connect(luaThread,SIGNAL(signalDialogFunction()),this,SLOT(onLuaDialogFunction()));
-    connect(luaThread,SIGNAL(signalStartDialog()),this,SLOT(onLuaStartDialog()));
-    connect(luaThread,SIGNAL(signalStateSave(QString)),this,SLOT(onLuaSaveState(QString)));
-    connect(luaThread,SIGNAL(signalStateLoad(QString)),this,SLOT(onLuaLoadState(QString)));
-    connect(emuThread,&EmuThread::luaUpdate,luaThread,&LuaThread::luaUpdate);
-    luaThread->start();
+    LuaScript::LuaDialog = new LuaConsoleDialog(this);
+    LuaScript::LuaDialog->show();
 }
-
 
 void MainWindow::onOpenInputConfig()
 {

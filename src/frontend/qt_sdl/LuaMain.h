@@ -1,13 +1,10 @@
-#ifndef LUAMAIN_H
-#define LUAMAIN_H
-#include <vector>
-#include <string.h>
+#ifndef LUASCRIPT_H
+#define LUASCRIPT_H
 #include <QDialog>
 #include <QPlainTextEdit>
 #include <QFileInfo>
-#include <QPushButton>
 #include <lua.hpp>
-#include <QThread>
+
 
 class LuaConsole: public QPlainTextEdit
 {
@@ -15,69 +12,32 @@ class LuaConsole: public QPlainTextEdit
 public:
     LuaConsole(QWidget* parent=nullptr);
 public slots:
-    void onGetText(QString text);
+    void onGetText(QString string);
     void onClear();
 };
-
 
 class LuaConsoleDialog: public QDialog
 {
     Q_OBJECT
 public:
-    LuaConsoleDialog(QWidget*parent=nullptr);
+    LuaConsoleDialog(QWidget*parent);
     LuaConsole* console;
     QFileInfo currentScript;
     QPushButton* buttonOpenScript;
     QPushButton* buttonStartStop;
     QPushButton* buttonPausePlay;
+    QScrollBar* bar;
 protected:
     void closeEvent(QCloseEvent *event) override;
-
 signals:
     void signalNewLua();
     void signalClosing();
 public slots:
-    void onStartStop();
+    //void onStartStop();
     void onOpenScript();
+    void onStop();
+    void onPausePlay();
 };
-
-class LuaThread : public QThread
-{
-    Q_OBJECT
-    void run() override;
-public:
-    explicit LuaThread(QObject* parent = nullptr);
-    void luaUpdate();
-    void luaStop();
-    void luaYeild();
-    void luaTogglePause();
-    void luaLayoutChange();
-    int luaDialogFunction(lua_State*,int (*)(lua_State*));
-    void luaDialogReturned();
-    int luaDialogStart(lua_State*,int);
-    void luaDialogClosed();
-    void luaPrint(QString string);
-    void luaClearConsole();
-    void luaStateSave(QString filename);
-    void luaStateLoad(QString filename);
-signals:
-    void signalStarted();
-    void signalChangeScreenLayout();
-    void signalDialogFunction();
-    void signalStartDialog();
-    void signalPrint(QString string);
-    void signalClearConsole();
-    void signalStateSave(QString filename);
-    void signalStateLoad(QString filename);
-private:
-    bool flagRunning;
-    bool flagUpdate;
-    bool flagDialogReturn;
-    bool flagDialogClosed;
-    bool flagPaused=false;
-};
-
-extern LuaThread* luaThread;
 
 struct OverlayCanvas
 {
@@ -86,6 +46,7 @@ struct OverlayCanvas
     QImage* buffer1;
     QImage* buffer2;
     QRect rectangle;
+
     bool isActive = true; // only active overlays are drawn
     unsigned int GLtexture; // used by GL rendering
     OverlayCanvas(int x,int y,int w, int h, bool active);
@@ -95,7 +56,15 @@ struct OverlayCanvas
 
 namespace LuaScript
 {
-
+void luaUpdate();
+void luaPrint(QString string);
+void luaClearConsole();
+void luaHookFunction(lua_State*,lua_Debug*);
+extern QWidget* panel;
+extern lua_State* MainLuaState;
+extern volatile bool FlagPause;
+extern volatile bool FlagStop;
+extern volatile bool FlagNewLua;
 typedef int(*luaFunctionPointer)(lua_State*);
 struct LuaFunction
 {
@@ -103,15 +72,11 @@ struct LuaFunction
     const char* name;
     LuaFunction(luaFunctionPointer,const char*,std::vector<LuaFunction*>*);
 };
-void LuaPrint(QString string);
-void Lua_Update();
-extern LuaConsoleDialog* LuaDialog;
-extern QWidget* panel; // to translate from global coordinates to local
+extern LuaConsoleDialog* LuaDialog;   
+void createLuaState();
 extern std::vector<OverlayCanvas> LuaOverlays;
 extern OverlayCanvas* CurrentCanvas;
-
 }
-
 
 
 #endif
