@@ -48,9 +48,11 @@ struct OverlayCanvas
     QRect rectangle;
 
     bool isActive = true; // only active overlays are drawn
-    unsigned int GLtexture; // used by GL rendering
+    unsigned int GLTexture; // used by GL rendering
+    bool GLTextureLoaded;
     OverlayCanvas(int x,int y,int w, int h, bool active);
     void flip();//used to swap buffers
+    bool flipped; //used to signal update to graphics.
 };
 
 

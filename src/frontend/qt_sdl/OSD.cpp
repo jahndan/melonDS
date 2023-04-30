@@ -451,20 +451,30 @@ void DrawGL(float w, float h)
     for (auto lo = LuaScript::LuaOverlays.begin(); lo != LuaScript::LuaOverlays.end();)
     {
         OverlayCanvas& overlay = *lo;
-        if (overlay.isActive){
-            glGenTextures(1,&overlay.GLtexture);
-            glBindTexture(GL_TEXTURE_2D, overlay.GLtexture);
+        if (overlay.flipped)
+        {
+            glDeleteTextures(1,&overlay.GLTexture);
+            overlay.flipped=false;
+            overlay.GLTextureLoaded=false;
+        }
+        if (!overlay.GLTextureLoaded)
+        {
+            glGenTextures(1,&overlay.GLTexture);
+            glBindTexture(GL_TEXTURE_2D, overlay.GLTexture);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, overlay.rectangle.width(), overlay.rectangle.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, overlay.displayBuffer->bits());
+            
+            overlay.GLTextureLoaded=true;
+        }
+        if (overlay.isActive){ //only active overlays get drawn. (textures still need to be loaded though)
+            glBindTexture(GL_TEXTURE_2D, overlay.GLTexture);
             glUniform2i(uOSDPos,overlay.rectangle.left(),overlay.rectangle.top());
             glUniform2i(uOSDSize,overlay.rectangle.width(),overlay.rectangle.height());
             glDrawArrays(GL_TRIANGLES, 0, 2*3);
-            glDeleteTextures(1,&overlay.GLtexture);
         }
-            
         lo++;
     }
 

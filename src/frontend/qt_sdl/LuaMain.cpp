@@ -191,6 +191,7 @@ void OverlayCanvas::flip()
         imageBuffer = buffer1;
         displayBuffer = buffer2;
     }
+    flipped = true;
 }
 
 std::vector<OverlayCanvas> LuaScript::LuaOverlays;
@@ -367,7 +368,7 @@ int Lua_getMouse(lua_State* L)
     }
     return 1;//returns table describing the current pos and state of the mouse
 }
-AddLuaFunction(Lua_getMouse,getMouse);
+AddLuaFunction(Lua_getMouse,GetMouse);
 
 /*
  *  Front end lua functions
@@ -406,7 +407,7 @@ int Lua_ClearOverlay(lua_State* L)
     LuaScript::CurrentCanvas->imageBuffer->fill(0x00000000);
     return 0;
 }
-AddLuaFunction(Lua_ClearOverlay,clearOverlay);
+AddLuaFunction(Lua_ClearOverlay,ClearOverlay);
 
 int Lua_Flip(lua_State* L)
 {
@@ -433,7 +434,7 @@ int Lua_text(lua_State* L)
     painter.drawText(x,y,message);
     return 0;
 }
-AddLuaFunction(Lua_text,text);
+AddLuaFunction(Lua_text,Text);
 
 int Lua_line(lua_State* L)
 {
@@ -447,7 +448,7 @@ int Lua_line(lua_State* L)
     painter.drawLine(x1,y1,x2,y2);
     return 0;
 }
-AddLuaFunction(Lua_line,line);
+AddLuaFunction(Lua_line,Line);
 
 int Lua_rect(lua_State* L)
 {
@@ -475,7 +476,7 @@ int Lua_fillrect(lua_State* L)
     painter.fillRect(x,y,width,height,color);
     return 0;
 }
-AddLuaFunction(Lua_fillrect,fillRect);
+AddLuaFunction(Lua_fillrect,FillRect);
 
 int Lua_keystrokes(lua_State* L)
 {
