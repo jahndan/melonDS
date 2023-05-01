@@ -78,6 +78,7 @@ extern LuaConsoleDialog* LuaDialog;
 void createLuaState();
 extern std::vector<OverlayCanvas> LuaOverlays;
 extern OverlayCanvas* CurrentCanvas;
+extern QHash<QString, QImage> ImageHash;
 }
 
 

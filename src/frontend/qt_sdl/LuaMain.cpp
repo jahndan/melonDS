@@ -207,7 +207,7 @@ void OverlayCanvas::flip()
 
 std::vector<OverlayCanvas> LuaScript::LuaOverlays;
 OverlayCanvas* LuaScript::CurrentCanvas;
-
+QHash<QString , QImage> LuaScript::ImageHash;
 
 
 
@@ -519,7 +519,54 @@ int Lua_keystrokes(lua_State* L)
 AddLuaFunction(Lua_keystrokes,Keys);
 
 
+int Lua_drawImage(lua_State* L)
+{
+    QString path = luaL_checkstring(L,1);
+    int x = luaL_checkinteger(L,2);
+    int y = luaL_checkinteger(L,3);
+    int sourceWidth= luaL_checkinteger(L,4);
+    int sourceHeight=luaL_checkinteger(L,5);
+    QPainter painter(LuaScript::CurrentCanvas->imageBuffer);
+    QImage image;
+    if(LuaScript::ImageHash.contains(path))
+    {
+        image=LuaScript::ImageHash[path];
+    }
+    else
+    {
+        image=QImage(path);
+        LuaScript::ImageHash[path]=image;
+    }
+    painter.drawImage(x,y,image,0,0,sourceWidth,sourceHeight);
+    return 0;
+}
+AddLuaFunction(Lua_drawImage,DrawImage);
 
+int Lua_clearImageHash(lua_State* L)
+{
+    LuaScript::ImageHash.clear();
+    return 0;
+}
+AddLuaFunction(Lua_clearImageHash,ClearHash);
+
+int Lua_getJoy(lua_State* L)
+{
+    u32 buttonMask=Input::InputMask;//current button state.
+    const char* keys[12] =
+    {//Buttons in order of mask.
+        "A","B","Select","Start",
+        "Right","Left","Up","Down",
+        "R","L","X","Y"
+    };
+    lua_createtable(L, 0, 12);
+    for(u32 i=0;i<12;i++)
+    {
+        lua_pushboolean(L,0>=(buttonMask&(1<<i)));
+        lua_setfield(L,-2,keys[i]);
+    }
+    return 1;
+}
+AddLuaFunction(Lua_getJoy,GetJoy);
 
 
 }
