@@ -3066,6 +3066,8 @@ void MainWindow::onOpenLuaScript()
         return;
     LuaScript::LuaDialog = new LuaConsoleDialog(this);
     LuaScript::LuaDialog->show();
+    connect(emuThread,&EmuThread::signalLuaSaveState,mainWindow,&MainWindow::onLuaSaveState);
+    connect(emuThread,&EmuThread::signalLuaLoadState,mainWindow,&MainWindow::onLuaLoadState);
 }
 
 void MainWindow::onOpenInputConfig()

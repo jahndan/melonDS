@@ -29,9 +29,9 @@ First we create a canvas at 0,0 (the top left of the screen), with width and hei
 
 `GetMouse()` similar to bizhawk's [input.getmouse()](https://tasvideos.org/Bizhawk/LuaFunctions)
 
-`NextFrame()` blocks until a signal from the emulator thread that a frame has passed then continues. To help provide compatability with bizhawks implementation, prefer `function _Update()` instead of "while true" loops.
+~~`NextFrame()` blocks until a signal from the emulator thread that a frame has passed then continues. To help provide compatability with bizhawks implementation, prefer `function _Update()` instead of "while true" loops.~~
 
-~~`StateSave()` / `StateLoad()` creates / loads a savestate from the given filename.~~
+`StateSave()` / `StateLoad()` creates / loads a savestate from the given filename.
 
 `Readu8(int address)` / `Readu16` / `Readu32` read unsined data from RAM in format specified.
 `Reads8(int address)`/ `Reads16` / `Reads32` read sined data from RAM in format specified

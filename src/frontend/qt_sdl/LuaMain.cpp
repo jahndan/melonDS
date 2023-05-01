@@ -87,6 +87,17 @@ void LuaScript::luaClearConsole()
     LuaDialog->console->clear();
 }
 
+void EmuThread::onLuaSaveState(QString string)
+{
+    emit signalLuaSaveState(string);
+}
+
+void EmuThread::onLuaLoadState(QString string)
+{
+    emit signalLuaLoadState(string);
+}
+
+
 
 std::vector<LuaScript::LuaFunction*> LuaFunctionList; // List of all lua functions.
 QWidget* LuaScript::panel=nullptr;
@@ -341,6 +352,22 @@ int Lua_NextFrame(lua_State* L)
     return 0;
 }
 //AddLuaFunction(Lua_NextFrame,NextFrame)
+
+int Lua_StateSave(lua_State* L)
+{
+    QString filename = luaL_checkstring(L,1);
+    emuThread->onLuaSaveState(filename);
+    return 0;
+}
+AddLuaFunction(Lua_StateSave,StateSave);
+
+int Lua_StateLoad(lua_State* L)
+{
+    QString filename = luaL_checkstring(L,1);
+    emuThread->onLuaLoadState(filename);
+    return 0;
+}
+AddLuaFunction(Lua_StateLoad,StateLoad);
 
 int Lua_getMouse(lua_State* L)
 {

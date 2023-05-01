@@ -63,8 +63,10 @@ public:
     void initContext();
     void deinitContext();
 
-    void onLuaPrint(QString string);
+    void onLuaPrint(QString);
     void onLuaClearConsole();
+    void onLuaLoadState(QString);
+    void onLuaSaveState(QString);
 
     int FrontBuffer = 0;
     QMutex FrontBufferLock;
@@ -92,9 +94,10 @@ signals:
 
     void syncVolumeLevel();
 
-    void luaUpdate();
     void signalLuaPrint(QString);
     void signalLuaClearConsole();
+    void signalLuaSaveState(QString);
+    void signalLuaLoadState(QString);
 
 private:
     void drawScreenGL();
