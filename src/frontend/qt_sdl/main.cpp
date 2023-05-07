@@ -1059,6 +1059,8 @@ ScreenHandler::~ScreenHandler()
 
 void ScreenHandler::screenSetupLayout(int w, int h)
 {
+    w=w-LuaScript::RightPadding+LuaScript::LeftPadding;
+    h=h-LuaScript::BottomPadding+LuaScript::TopPadding;
     int sizing = Config::ScreenSizing;
     if (sizing == 3) sizing = autoScreenSizing;
 
@@ -1098,41 +1100,44 @@ QSize ScreenHandler::screenGetMinSize(int factor = 1)
 
     int w = 256 * factor;
     int h = 192 * factor;
+    int wp = LuaScript::RightPadding+LuaScript::LeftPadding;
+    int hp = LuaScript::BottomPadding+LuaScript::TopPadding;
 
     if (Config::ScreenSizing == 4 || Config::ScreenSizing == 5)
     {
-        return QSize(w, h);
+        return QSize(w+wp, h+hp);
     }
 
     if (Config::ScreenLayout == 0) // natural
     {
         if (isHori)
-            return QSize(h+gap+h, w);
+            return QSize(h+gap+h+wp, w+hp);
         else
-            return QSize(w, h+gap+h);
+            return QSize(w+wp, h+gap+h+hp);
     }
     else if (Config::ScreenLayout == 1) // vertical
     {
         if (isHori)
-            return QSize(h, w+gap+w);
+            return QSize(h+wp, w+gap+w+hp);
         else
-            return QSize(w, h+gap+h);
+            return QSize(w+wp, h+gap+h+hp);
     }
     else if (Config::ScreenLayout == 2) // horizontal
     {
         if (isHori)
-            return QSize(h+gap+h, w);
+            return QSize(h+gap+h+wp, w+hp);
         else
-            return QSize(w+gap+w, h);
+            return QSize(w+gap+w+wp, h+hp);
     }
     else // hybrid
     {
         if (isHori)
-            return QSize(h+gap+h, 3*w + (int)ceil((4*gap) / 3.0));
+            return QSize(h+gap+h+wp, hp+3*w + (int)ceil((4*gap) / 3.0));
         else
-            return QSize(3*w + (int)ceil((4*gap) / 3.0), h+gap+h);
+            return QSize(wp+3*w + (int)ceil((4*gap) / 3.0), h+gap+h+hp);
     }
 }
+
 
 void ScreenHandler::screenOnMousePress(QMouseEvent* event)
 {
@@ -3064,7 +3069,7 @@ void MainWindow::onOpenLuaScript()
 {
     if (LuaScript::LuaDialog) // only one at a time.
         return;
-    LuaScript::LuaDialog = new LuaConsoleDialog(this);
+    LuaScript::LuaDialog = new LuaScript::LuaConsoleDialog(this);
     LuaScript::LuaDialog->show();
     connect(emuThread,&EmuThread::signalLuaSaveState,mainWindow,&MainWindow::onLuaSaveState);
     connect(emuThread,&EmuThread::signalLuaLoadState,mainWindow,&MainWindow::onLuaLoadState);

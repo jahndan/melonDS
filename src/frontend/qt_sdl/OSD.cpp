@@ -401,7 +401,7 @@ void DrawNative(QPainter& painter)
 
     for (auto lo = LuaScript::LuaOverlays.begin(); lo != LuaScript::LuaOverlays.end();)
     {
-        OverlayCanvas& overlay = *lo;
+        LuaScript::OverlayCanvas& overlay = *lo;
         if (overlay.isActive)
             painter.drawImage(overlay.rectangle,*overlay.displayBuffer);
         lo++;
@@ -450,7 +450,7 @@ void DrawGL(float w, float h)
 
     for (auto lo = LuaScript::LuaOverlays.begin(); lo != LuaScript::LuaOverlays.end();)
     {
-        OverlayCanvas& overlay = *lo;
+        LuaScript::OverlayCanvas& overlay = *lo;
         if (overlay.flipped)
         {
             glDeleteTextures(1,&overlay.GLTexture);

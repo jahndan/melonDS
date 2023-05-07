@@ -67,6 +67,7 @@ public:
     void onLuaClearConsole();
     void onLuaLoadState(QString);
     void onLuaSaveState(QString);
+    void onLuaLayoutChange();
 
     int FrontBuffer = 0;
     QMutex FrontBufferLock;

@@ -6,6 +6,9 @@
 #include <lua.hpp>
 
 
+namespace LuaScript
+{
+
 class LuaConsole: public QPlainTextEdit
 {
     Q_OBJECT
@@ -56,17 +59,15 @@ struct OverlayCanvas
 };
 
 
-namespace LuaScript
-{
 void luaUpdate();
 void luaPrint(QString string);
 void luaClearConsole();
 void luaHookFunction(lua_State*,lua_Debug*);
 extern QWidget* panel;
 extern lua_State* MainLuaState;
-extern volatile bool FlagPause;
-extern volatile bool FlagStop;
-extern volatile bool FlagNewLua;
+extern bool FlagPause;
+extern bool FlagStop;
+extern bool FlagNewLua;
 typedef int(*luaFunctionPointer)(lua_State*);
 struct LuaFunction
 {
@@ -79,6 +80,11 @@ void createLuaState();
 extern std::vector<OverlayCanvas> LuaOverlays;
 extern OverlayCanvas* CurrentCanvas;
 extern QHash<QString, QImage> ImageHash;
+extern int RightPadding;
+extern int BottomPadding;
+extern int TopPadding;
+extern int LeftPadding;
+
 }
 
 
