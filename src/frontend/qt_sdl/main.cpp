@@ -2743,11 +2743,10 @@ void MainWindow::onEjectGBACart()
     updateCartInserted(true);
 }
 
-void MainWindow::onLuaSaveState(QString filename)
+void MainWindow::onLuaSaveState(const QString& filename)
 {
     emuThread->emuPause();
     ROMManager::SaveState(filename.toStdString());
-    printf("StateSavedTo: %s",filename.toStdString().c_str());
     emuThread->emuUnpause();
 }
 
@@ -2795,7 +2794,7 @@ void MainWindow::onSaveState()
     emuThread->emuUnpause();
 }
 
-void MainWindow::onLuaLoadState(QString filename)
+void MainWindow::onLuaLoadState(const QString& filename)
 {
     emuThread->emuPause();
     ROMManager::LoadState(filename.toStdString());

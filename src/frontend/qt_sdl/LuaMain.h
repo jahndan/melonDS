@@ -13,7 +13,7 @@ class LuaConsole: public QPlainTextEdit
 public:
     LuaConsole(QWidget* parent=nullptr);
 public slots:
-    void onGetText(QString string);
+    void onGetText(const QString& string);
     void onClear();
 };
 

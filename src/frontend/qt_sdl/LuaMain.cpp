@@ -16,7 +16,7 @@
 
 extern EmuThread* emuThread;
 
-void EmuThread::onLuaPrint(QString string)
+void EmuThread::onLuaPrint(const QString& string)
 {
     emit signalLuaPrint(string);
 }
@@ -26,7 +26,7 @@ void EmuThread::onLuaClearConsole()
     emit signalLuaClearConsole();
 }
 
-void EmuThread::onLuaLoadState(QString string)
+void EmuThread::onLuaLoadState(const QString& string)
 {
     emit signalLuaLoadState(string);
 }
@@ -36,7 +36,7 @@ void EmuThread::onLuaLayoutChange()
     emit screenLayoutChange();
 }
 
-void EmuThread::onLuaSaveState(QString string)
+void EmuThread::onLuaSaveState(const QString& string)
 {
     emit signalLuaSaveState(string);
 }
@@ -85,7 +85,7 @@ LuaConsole::LuaConsole(QWidget* parent)
     this->setParent(parent);
 }
 
-void LuaConsole::onGetText(QString string)
+void LuaConsole::onGetText(const QString& string)
 {
     this->appendPlainText(string);
     QScrollBar* bar = verticalScrollBar();

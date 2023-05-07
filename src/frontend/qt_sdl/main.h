@@ -63,10 +63,10 @@ public:
     void initContext();
     void deinitContext();
 
-    void onLuaPrint(QString);
+    void onLuaPrint(const QString&);
     void onLuaClearConsole();
-    void onLuaLoadState(QString);
-    void onLuaSaveState(QString);
+    void onLuaLoadState(const QString&);
+    void onLuaSaveState(const QString&);
     void onLuaLayoutChange();
 
     int FrontBuffer = 0;
@@ -95,10 +95,10 @@ signals:
 
     void syncVolumeLevel();
 
-    void signalLuaPrint(QString);
+    void signalLuaPrint(const QString&);
     void signalLuaClearConsole();
-    void signalLuaSaveState(QString);
-    void signalLuaLoadState(QString);
+    void signalLuaSaveState(const QString&);
+    void signalLuaLoadState(const QString&);
 
 private:
     void drawScreenGL();
@@ -283,9 +283,9 @@ private slots:
     void onInsertGBACart();
     void onInsertGBAAddon();
     void onEjectGBACart();
-    void onLuaSaveState(QString filename);
+    void onLuaSaveState(const QString& filename);
     void onSaveState();
-    void onLuaLoadState(QString filename);
+    void onLuaLoadState(const QString& filename);
     void onLoadState();
     void onUndoStateLoad();
     void onImportSavefile();
