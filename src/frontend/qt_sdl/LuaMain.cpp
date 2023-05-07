@@ -7,14 +7,12 @@
 #include <QScrollBar>
 #include <QPainter>
 
-
 #include  "main.h"
 #include "types.h"
 #include "NDS.h"
 
 #include <SDL_joystick.h>
 #include "Input.h"
-
 
 extern EmuThread* emuThread;
 
@@ -42,8 +40,6 @@ void EmuThread::onLuaSaveState(QString string)
 {
     emit signalLuaSaveState(string);
 }
-
-
 
 namespace LuaScript
 {
@@ -102,17 +98,10 @@ void LuaConsole::onClear()
     this->clear();
 }
 
-
-
-
 void luaClearConsole()
 {
     LuaDialog->console->clear();
 }
-
-
-
-
 
 std::vector<LuaFunction*> LuaFunctionList; // List of all lua functions.
 QWidget* panel=nullptr;
@@ -127,7 +116,6 @@ LuaFunction::LuaFunction(luaFunctionPointer cf,const char* n,std::vector<LuaFunc
     this->name=n;
     container->push_back(this);
 }
-
 
 #define MELON_LUA_HOOK_INSTRUCTION_COUNT 50 //number of vm instructions between hook calls
 void luaHookFunction(lua_State* L, lua_Debug *arg)
@@ -204,6 +192,8 @@ OverlayCanvas::OverlayCanvas(int x,int y,int width,int height,bool isActive)
     imageBuffer = buffer1;
     displayBuffer = buffer2;
     rectangle = QRect(x,y,width,height);
+    flipped = false;
+    GLTextureLoaded = false;
 }
 void OverlayCanvas::flip()
 {
@@ -229,11 +219,6 @@ int BottomPadding = 0;
 int LeftPadding = 0;
 int TopPadding = 0;
 
-
-
-
-
-
 #define AddLuaFunction(functPointer,name)LuaFunction name(functPointer,#name,&LuaFunctionList)
 
 /*
@@ -242,7 +227,6 @@ int TopPadding = 0;
 
 namespace LuaFunctionDefinition
 {
-
 int lua_MelonPrint(lua_State* L)
 {
     QString string = luaL_checkstring(L,1);
@@ -294,7 +278,6 @@ s32 GetMainRAMValueS(const u32& addr, const ramInfo_ByteType& byteType)
         return 0;
     }
 }
-
 
 int Lua_ReadDatau(lua_State* L,ramInfo_ByteType byteType) 
 {   
@@ -364,13 +347,6 @@ int Lua_NDSTapUp(lua_State* L)
     return 0;
 }
 AddLuaFunction(Lua_NDSTapUp,NDSTapUp);
-
-int Lua_NextFrame(lua_State* L)
-{
-    //TODO
-    return 0;
-}
-//AddLuaFunction(Lua_NextFrame,NextFrame)
 
 int Lua_StateSave(lua_State* L)
 {
@@ -537,7 +513,6 @@ int Lua_keystrokes(lua_State* L)
 }
 AddLuaFunction(Lua_keystrokes,Keys);
 
-
 int Lua_drawImage(lua_State* L)
 {
     QString path = luaL_checkstring(L,1);
@@ -598,6 +573,5 @@ int Lua_setPadding(lua_State* L) //TODO: Currently only works well with force in
 }
 AddLuaFunction(Lua_setPadding,SetPadding);
 
-
-}
-}
+}//LuaFunctionDefinition
+}//LuaScript

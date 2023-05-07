@@ -5,10 +5,8 @@
 #include <QFileInfo>
 #include <lua.hpp>
 
-
 namespace LuaScript
 {
-
 class LuaConsole: public QPlainTextEdit
 {
     Q_OBJECT
@@ -58,7 +56,6 @@ struct OverlayCanvas
     bool flipped; //used to signal update to graphics.
 };
 
-
 void luaUpdate();
 void luaPrint(QString string);
 void luaClearConsole();
@@ -84,8 +81,5 @@ extern int RightPadding;
 extern int BottomPadding;
 extern int TopPadding;
 extern int LeftPadding;
-
 }
-
-
 #endif
