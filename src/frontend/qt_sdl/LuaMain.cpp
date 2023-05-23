@@ -68,6 +68,7 @@ void LuaConsoleDialog::closeEvent(QCloseEvent *event)
 {
     onStop();
     LuaDialog=nullptr;
+    LuaOverlays.clear();
     event->accept();
 }
 
