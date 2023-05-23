@@ -55,7 +55,7 @@ struct OverlayCanvas
     void flip();//used to swap buffers
     bool flipped; //used to signal update to graphics.
 };
-
+void luaResetOSD();
 void luaUpdate();
 void luaPrint(QString string);
 void luaClearConsole();
