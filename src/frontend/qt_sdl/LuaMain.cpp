@@ -6,11 +6,9 @@
 #include <QGuiApplication>
 #include <QScrollBar>
 #include <QPainter>
-
 #include  "main.h"
 #include "types.h"
 #include "NDS.h"
-
 #include <SDL_joystick.h>
 #include "Input.h"
 
@@ -67,7 +65,7 @@ LuaConsoleDialog::LuaConsoleDialog(QWidget* parent) : QDialog(parent)
 void LuaConsoleDialog::closeEvent(QCloseEvent *event)
 {
     onStop();
-    LuaDialog=nullptr;
+    LuaDialog = nullptr;
     LuaOverlays.clear();
     event->accept();
 }
@@ -77,7 +75,7 @@ void LuaConsoleDialog::onOpenScript()
     QFileInfo file = QFileInfo(QFileDialog::getOpenFileName(this, "Load Lua Script",QDir::currentPath()));
     if (!file.exists())
         return;
-    currentScript=file;
+    currentScript = file;
     FlagNewLua = true;
 }
 
@@ -93,7 +91,6 @@ void LuaConsole::onGetText(const QString& string)
     bar->setValue(bar->maximum());
 }
 
-
 void LuaConsole::onClear()
 {
     this->clear();
@@ -105,16 +102,16 @@ void luaClearConsole()
 }
 
 std::vector<LuaFunction*> LuaFunctionList; // List of all lua functions.
-QWidget* panel=nullptr;
-lua_State* MainLuaState=nullptr;
-bool FlagPause=false;
-bool FlagStop=false;
-bool FlagNewLua=false;
+QWidget* panel = nullptr;
+lua_State* MainLuaState = nullptr;
+bool FlagPause = false;
+bool FlagStop = false;
+bool FlagNewLua = false;
 
 LuaFunction::LuaFunction(luaFunctionPointer cf,const char* n,std::vector<LuaFunction*>* container)
 {
-    this->cfunction=cf;
-    this->name=n;
+    this->cfunction = cf;
+    this->name = n;
     container->push_back(this);
 }
 
@@ -131,7 +128,7 @@ void createLuaState()
         return;
     LuaOverlays.clear();
     FlagNewLua = false;
-    MainLuaState=nullptr;
+    MainLuaState = nullptr;
     std::string fileName = LuaDialog->currentScript.fileName().toStdString();
     std::string filedir = LuaDialog->currentScript.dir().path().toStdString();
     lua_State* L = luaL_newstate();
@@ -143,14 +140,13 @@ void createLuaState()
     FlagStop = false;
     if (luaL_dofile(L,&fileName[0])==LUA_OK)
     {
-        MainLuaState=L;
-        FlagPause=false;
+        MainLuaState = L;
+        FlagPause = false;
     }
     else //Error loading script
     {
         emuThread->onLuaPrint(lua_tostring(L,-1));
-        MainLuaState=nullptr;
-
+        MainLuaState = nullptr;
     }
 }
 
@@ -293,7 +289,7 @@ s32 GetMainRAMValueS(const u32& addr, const ramInfo_ByteType& byteType)
 int Lua_ReadDatau(lua_State* L,ramInfo_ByteType byteType) 
 {   
     u32 address = luaL_checkinteger(L,1);
-    u32 value =GetMainRAMValueU(address,byteType);
+    u32 value = GetMainRAMValueU(address,byteType);
     lua_pushinteger(L, value);
     return 1;
 }
@@ -344,10 +340,9 @@ AddLuaFunction(Lua_Reads32,Reads32);
 
 int Lua_NDSTapDown(lua_State* L)
 {
-    int x =luaL_checkinteger(L,1);
-    int y =luaL_checkinteger(L,2);
+    int x = luaL_checkinteger(L,1);
+    int y = luaL_checkinteger(L,2);
     NDS::TouchScreen(x,y);
-    
     return 0;
 }
 AddLuaFunction(Lua_NDSTapDown,NDSTapDown);
@@ -379,8 +374,8 @@ int Lua_getMouse(lua_State* L)
 {
     Qt::MouseButtons btns = QGuiApplication::mouseButtons();
     QPoint pos = panel->mapFromGlobal(QCursor::pos(QGuiApplication::primaryScreen()));
-    const char* keys[6]={"Left","Middle","Right","XButton1","XButton2","Wheel"};
-    bool vals[6]=
+    const char* keys[6] = {"Left","Middle","Right","XButton1","XButton2","Wheel"};
+    bool vals[6] =
     {
         btns.testFlag(Qt::LeftButton),
         btns.testFlag(Qt::MiddleButton),
@@ -414,13 +409,13 @@ int Lua_MakeCanvas(lua_State* L) //MakeCanvas(int x,int y,int width,int height,[
     bool a = true;
     if (lua_isboolean(L,-1))
     {
-        offset=-1;
+        offset = -1;
         bool a = lua_toboolean(L,-1);
     }
-    int x=lua_tonumber(L,-4+offset);
-    int y=lua_tonumber(L,-3+offset);
-    int w=lua_tonumber(L,-2+offset);
-    int h=lua_tonumber(L,-1+offset);
+    int x = lua_tonumber(L,-4+offset);
+    int y = lua_tonumber(L,-3+offset);
+    int w = lua_tonumber(L,-2+offset);
+    int h = lua_tonumber(L,-1+offset);
     OverlayCanvas canvas(x,y,w,h,a);
     lua_pushinteger(L,LuaOverlays.size());
     LuaOverlays.push_back(canvas);
@@ -430,7 +425,7 @@ AddLuaFunction(Lua_MakeCanvas,MakeCanvas);
 
 int Lua_SetCanvas(lua_State* L)
 {
-    int index=lua_tonumber(L,-1);
+    int index = lua_tonumber(L,-1);
     CurrentCanvas = &LuaOverlays.at(index);
     return 0;
 }
@@ -456,7 +451,7 @@ int Lua_text(lua_State* L)
     int y = lua_tonumber(L,-5);
     const char* message = lua_tostring(L,-4);
     u32 color = lua_tonumber(L,-3);
-    QString FontFamily= lua_tostring(L,-2);
+    QString FontFamily = lua_tostring(L,-2);
     int size = lua_tonumber(L,-1);
     QPainter painter(CurrentCanvas->imageBuffer);
     QFont font(FontFamily,size,0,false);
@@ -514,7 +509,7 @@ AddLuaFunction(Lua_fillrect,FillRect);
 int Lua_keystrokes(lua_State* L)
 {
     lua_createtable(L,0,Input::Keystrokes.size());
-    for (int i=0; i<Input::Keystrokes.size(); i++)
+    for (int i = 0; i<Input::Keystrokes.size(); i++)
     {
         lua_pushinteger(L,Input::Keystrokes.at(i));
         lua_seti(L,-2,i);
@@ -529,8 +524,8 @@ int Lua_drawImage(lua_State* L)
     QString path = luaL_checkstring(L,1);
     int x = luaL_checkinteger(L,2);
     int y = luaL_checkinteger(L,3);
-    int sourceWidth= luaL_checkinteger(L,4);
-    int sourceHeight=luaL_checkinteger(L,5);
+    int sourceWidth = luaL_checkinteger(L,4);
+    int sourceHeight = luaL_checkinteger(L,5);
     QPainter painter(CurrentCanvas->imageBuffer);
     QImage image;
     if(ImageHash.contains(path))
@@ -540,7 +535,7 @@ int Lua_drawImage(lua_State* L)
     else
     {
         image=QImage(path);
-        ImageHash[path]=image;
+        ImageHash[path] = image;
     }
     painter.drawImage(x,y,image,0,0,sourceWidth,sourceHeight);
     return 0;
@@ -566,7 +561,7 @@ int Lua_getJoy(lua_State* L)
     lua_createtable(L, 0, 12);
     for(u32 i=0;i<12;i++)
     {
-        lua_pushboolean(L,0>=(buttonMask&(1<<i)));
+        lua_pushboolean(L,0 >= (buttonMask&(1<<i)));
         lua_setfield(L,-2,keys[i]);
     }
     return 1;

@@ -460,13 +460,13 @@ void DrawGL(float w, float h)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, overlay.rectangle.width(), overlay.rectangle.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, overlay.displayBuffer->bits());
-            overlay.GLTextureLoaded=true;
+            overlay.GLTextureLoaded = true;
         }
         if (overlay.flipped)
         {
             glBindTexture(GL_TEXTURE_2D, overlay.GLTexture);
             glTexSubImage2D(GL_TEXTURE_2D,0,0,0,overlay.rectangle.width(),overlay.rectangle.height(),GL_RGBA,GL_UNSIGNED_BYTE,overlay.displayBuffer->bits());
-            overlay.flipped=false;
+            overlay.flipped = false;
         }
         if (overlay.isActive){ //only active overlays get drawn. (textures are still updated though)
             glBindTexture(GL_TEXTURE_2D, overlay.GLTexture);

@@ -1059,8 +1059,8 @@ ScreenHandler::~ScreenHandler()
 
 void ScreenHandler::screenSetupLayout(int w, int h)
 {
-    w=w-LuaScript::RightPadding+LuaScript::LeftPadding;
-    h=h-LuaScript::BottomPadding+LuaScript::TopPadding;
+    w = w - LuaScript::RightPadding + LuaScript::LeftPadding;
+    h = h - LuaScript::BottomPadding + LuaScript::TopPadding;
     int sizing = Config::ScreenSizing;
     if (sizing == 3) sizing = autoScreenSizing;
 
@@ -1100,8 +1100,8 @@ QSize ScreenHandler::screenGetMinSize(int factor = 1)
 
     int w = 256 * factor;
     int h = 192 * factor;
-    int wp = LuaScript::RightPadding+LuaScript::LeftPadding;
-    int hp = LuaScript::BottomPadding+LuaScript::TopPadding;
+    int wp = LuaScript::RightPadding + LuaScript::LeftPadding;
+    int hp = LuaScript::BottomPadding + LuaScript::TopPadding;
 
     if (Config::ScreenSizing == 4 || Config::ScreenSizing == 5)
     {
