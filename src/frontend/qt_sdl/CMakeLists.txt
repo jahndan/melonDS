@@ -87,7 +87,7 @@ pkg_check_modules(Slirp REQUIRED IMPORTED_TARGET slirp)
 pkg_check_modules(LibArchive REQUIRED IMPORTED_TARGET libarchive)
 pkg_search_module(Lua REQUIRED IMPORTED_TARGET lua-5.4 lua-5.3 lua>=5.3)
 pkg_check_modules(Zstd REQUIRED IMPORTED_TARGET libzstd)
-s
+
 fix_interface_includes(PkgConfig::SDL2 PkgConfig::Slirp PkgConfig::LibArchive)
 
 add_compile_definitions(ARCHIVE_SUPPORT_ENABLED)
