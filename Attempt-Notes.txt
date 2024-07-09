@@ -1,0 +1,123 @@
+# notes and todos
+
+yet to update: github actions and anything else to do with building
+yet to update: README.md needs updates regarding dependencies for non-macOS
+yet to update: LuaScript.md in it's entirety
+
+### src/frontend/qt_sdl/CMakeLists.txt
+- should it be pkg_search_module or pkg_check_module for Lua? unfamiliar with cmake
+
+### src/frontend/qt_sdl/Input.*
+- add int vector to track keystrokes for luascripting purposes
+
+### stuff that used to be in src/frontend/qt_sdl/main.cpp
+- include LuaMain? if refactored as a class, this probably does not get included here
+- should it be somewhere else? luascript handling at the end of EmuThread::run()
+- not sure what this was but it was in the original PR:
+    luascript padding in ScreenHandler::screenSetupLayout() and ::screenGetMinSize()
+- MainWindow constructor, add menu option for LuaScript
+- LuaScript::panel stuff for mouse pos in MainWindow::createScreenPanel()
+- MainWindow::onLuaSaveState() and ::onLuaLoadState()
+- MainWindow::onOpenLuaScript()
+- MainWindow::onUpdateVideoSettings() handle glchange and reset OSD
+
+### stuff that used to be in src/frontend/qt_sdl/main.h
+- Lua-specific functions:
+```
++    void onLuaLoadState(const QString&);
++    void onLuaSaveState(const QString&);
+...
++    void signalLuaPrint(const QString&);
++    void signalLuaClearConsole();
++    void signalLuaSaveState(const QString&);
++    void signalLuaLoadState(const QString&);
+...
++    void onOpenLuaScript();
+```
+
+src/frontend/qt_sdl/LuaMain.cpp and LuaMain.h
+- needs refactor for multi-instance? also code style cleanup
+
+
+most code has been moved to the correct corresponding places, but it still needs
+a fair amount of work to build, since we now have EmuInstances to worry about
+
+I'm pretty sure each instance needs to have its own scripting engine, so LuaMain 
+requires a bit of a restructure and several functions may need slight rewriting
+to correctly access the appropriate variables
+
+my instinct is to make the scripting engine a class and embed it in EmuInstance,
+but they do say to avoid OOP when possible
+
+
+
+
+
+my attempt at summarizing how all the main classes fit together:
+
+
+# NDS
+   // frontend should change this manually after creating/destroying an NDS object
+   Current: static NDS object pointer
+   // multiple NDS objects not supported yet?
+
+# EmuInstance
+   # member variables
+      emuThread:    EmuThread object pointer
+      mainWindow:   MainWindow object pointer
+      windowList:   MainWindow object pointer array
+      nds:          NDS object pointer
+   # forward declared friend classes
+      friend EmuThread
+      friend MainWindow
+
+# EmuThread
+   # member variables
+      emuInstance:  EmuInstance object pointer
+   # signals
+      windowUpdate             -> ScreenPanel.repaint
+                                        (inherited from QWidget)
+      windowTitleChange        -> MainWindow.onTitleUpdate
+      windowEmuStart           -> MainWindow.onEmuStart
+      windowEmuStop            -> MainWindow.onEmuStop
+      windowEmuPause           -> MainWindow.onEmuPause
+      windowEmuReset           -> MainWindow.onEmuReset
+      windowLimitFPSChange     -> MainWindow.actLimitFramerate.trigger
+                                        (inherited from QAction)
+      autoScreenSizingChange   -> ScreenPanel.onAutoScreenSizingChaned
+      windowFullscreenToggle   -> MainWindow.onFullscreenToggled
+      swapScreensToggle        -> MainWindow.actScreenSwap.trigger
+                                        (inherited from QAction)
+      screenEmphasisToggle     -> MainWindow.onScreenEmphasisToggled
+      syncVolumeLevel          -> AudioSettingsDialog.onSyncVolumeLevel
+# most of these signals are directed to a MainWindow object named `window` which is
+    a parameter of the function `attachWindow()` that makes the connections
+# the ones directed to a ScreenPanel object are referencing the `screen` associated
+    with `window`, i.e. `window->screen`
+
+# ScreenPanel
+   # member variables
+      mainWindow:   MainWindow object pointer
+      emuInstance:  EmuInstance object pointer
+   # slots
+      onScreenLayoutChanged
+      onAutoScreenSizingChanged
+
+# MainWindow
+   # member variables
+      emuInstance:  EmuInstance object pointer
+      emuThread:    EmuThread object pointer
+      panel:        ScreenPanel object pointer
+   # signals
+      screenLayoutChange       -> ScreenPanel.onScreenLayoutChanged
+   # slots (a lot more, but here are the most scripting-relevant ones)
+      onSaveState
+      onLoadState
+      onUndoStateLoad
+      onMPNewInstance
+      onChangeShowOSD
+      onChangeLimitFramerate
+
+# main (not an object)
+   emuInstances: EmuInstance object pointer array
+

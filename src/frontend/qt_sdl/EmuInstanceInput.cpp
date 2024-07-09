@@ -175,6 +175,10 @@ void EmuInstance::onKeyPress(QKeyEvent* event)
 {
     int keyHK = getEventKeyVal(event);
     int keyKP = keyHK;
+
+    // TODO bring this back once each instance has its own scripting engine
+    // Keystrokes.push_back(keyHK); // make input available to lua scripts
+
     if (event->modifiers() != Qt::KeypadModifier)
         keyKP &= ~event->modifiers();
 
@@ -191,6 +195,9 @@ void EmuInstance::onKeyRelease(QKeyEvent* event)
 {
     int keyHK = getEventKeyVal(event);
     int keyKP = keyHK;
+
+    // TODO does Lua scripting need to know about key releases?
+
     if (event->modifiers() != Qt::KeypadModifier)
         keyKP &= ~event->modifiers();
 

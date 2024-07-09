@@ -160,6 +160,7 @@ private slots:
     void onFrameStep();
     void onOpenPowerManagement();
     void onOpenDateTime();
+    void onOpenLuaScript();
     void onEnableCheats(bool checked);
     void onSetupCheats();
     void onCheatsDialogFinished(int res);
@@ -210,6 +211,13 @@ private slots:
     void onEmuStop();
     void onEmuPause(bool pause);
     void onEmuReset();
+
+    void onLuaPrint(const QString &);
+    void onLuaClearConsole();
+    void onLuaLayoutChange();
+    // TODO: lua script save states?
+    // void onLuaLoadState(const QString &);
+    // void onLuaSaveState(const QString &);
 
     void onUpdateVideoSettings(bool glchange);
 
@@ -272,6 +280,7 @@ public:
     QAction* actFrameStep;
     QAction* actPowerManagement;
     QAction* actDateTime;
+    QAction *actLuaScript;
     QAction* actEnableCheats;
     QAction* actSetupCheats;
     QAction* actROMInfo;

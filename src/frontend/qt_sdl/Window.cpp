@@ -74,6 +74,8 @@
 #include "Savestate.h"
 #include "LocalMP.h"
 
+#include "LuaMain.h"
+
 //#include "main_shaders.h"
 
 #include "EmuInstance.h"
@@ -390,6 +392,11 @@ MainWindow::MainWindow(int id, EmuInstance* inst, QWidget* parent) :
 
         actDateTime = menu->addAction("Date and time");
         connect(actDateTime, &QAction::triggered, this, &MainWindow::onOpenDateTime);
+
+        menu->addSeparator();
+
+        actLuaScript = menu->addAction("Lua scripting");
+        connect(actLuaScript, &QAction::triggered, this, &MainWindow::onOpenLuaScript);
 
         menu->addSeparator();
 
@@ -787,6 +794,8 @@ void MainWindow::createScreenPanel()
         panel->show();
     }
     setCentralWidget(panel);
+
+    LuaScript::panel = panel; // allow lua scripts to track mouse pos
 
     actScreenFiltering->setEnabled(hasOGL);
     panel->osdSetEnabled(showOSD);
@@ -1424,6 +1433,15 @@ void MainWindow::onEjectGBACart()
     updateCartInserted(true);
 }
 
+// TODO: lua script save states?
+// void MainWindow::onLuaSaveState(const QString &filename)
+// {
+//     emuThread->emuPause();
+//     // TODO handle failure?
+//     emuInstance->saveState(filename.toStdString());
+//     emuThread->emuUnpause();
+// }
+
 void MainWindow::onSaveState()
 {
     int slot = ((QAction*)sender())->data().toInt();
@@ -1465,6 +1483,15 @@ void MainWindow::onSaveState()
 
     emuThread->emuUnpause();
 }
+
+// TODO: lua script save states?
+// void MainWindow::onLuaLoadState(const QString &filename)
+// {
+//     emuThread->emuPause();
+//     // TODO handle failure?
+//     emuInstance->loadState(filename.toStdString());
+//     emuThread->emuUnpause();
+// }
 
 void MainWindow::onLoadState()
 {
@@ -1630,6 +1657,17 @@ void MainWindow::onOpenDateTime()
 void MainWindow::onOpenPowerManagement()
 {
     PowerManagementDialog* dlg = PowerManagementDialog::openDlg(this);
+}
+
+void MainWindow::onOpenLuaScript()
+{
+    if (LuaScript::LuaDialog) // only one at a time.
+        return;
+    LuaScript::LuaDialog = new LuaScript::LuaConsoleDialog(this);
+    LuaScript::LuaDialog->show();
+    // TODO: lua script save states?
+    // connect(emuThread, &EmuThread::signalLuaSaveState, mainWindow, &MainWindow::onLuaSaveState);
+    // connect(emuThread, &EmuThread::signalLuaLoadState, mainWindow, &MainWindow::onLuaLoadState);
 }
 
 void MainWindow::onEnableCheats(bool checked)
@@ -2090,6 +2128,7 @@ void MainWindow::onUpdateVideoSettings(bool glchange)
 {
     if (glchange)
     {
+        LuaScript::luaResetOSD(); // may need updating
         emuThread->emuPause();
         if (hasOGL) emuThread->deinitContext();
 

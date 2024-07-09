@@ -33,6 +33,7 @@ As for the rest, the interface should be pretty straightforward. If you have a q
 ## How to build
 
 ### Linux
+<!-- TODO add lua to dependencies here -->
 1. Install dependencies:
    * Ubuntu 22.04: `sudo apt install cmake extra-cmake-modules libcurl4-gnutls-dev libpcap0.8-dev libsdl2-dev qtbase5-dev qtbase5-private-dev qtmultimedia5-dev libarchive-dev libzstd-dev`
    * Older Ubuntu: `sudo apt install cmake extra-cmake-modules libcurl4-gnutls-dev libpcap0.8-dev libsdl2-dev qt5-default qtbase5-private-dev qtmultimedia5-dev libarchive-dev libzstd-dev`
@@ -50,6 +51,7 @@ As for the rest, the interface should be pretty straightforward. If you have a q
    ```
 
 ### Windows
+<!-- TODO add lua to dependencies here -->
 1. Install [MSYS2](https://www.msys2.org/)
 2. Open the **MSYS2 MinGW 64-bit** terminal
 3. Update the packages using `pacman -Syu` and reopen the terminal if it asks you to
@@ -57,12 +59,14 @@ As for the rest, the interface should be pretty straightforward. If you have a q
    ```bash
    pacman -S git
    ```
+<!-- TODO fix step numbering -->
 5. Download the melonDS repository and prepare:
    ```bash
    git clone https://github.com/melonDS-emu/melonDS
    cd melonDS
    ```
 #### Dynamic builds (with DLLs)
+<!-- TODO add lua to dependencies here -->
 5. Install dependencies: `pacman -S mingw-w64-x86_64-{cmake,SDL2,toolchain,qt5-base,qt5-svg,qt5-multimedia,qt5-tools,libarchive,zstd}`
 6. Compile:
    ```bash
@@ -74,6 +78,7 @@ As for the rest, the interface should be pretty straightforward. If you have a q
 If everything went well, melonDS and the libraries it needs should now be in the `dist` folder.
 
 #### Static builds (without DLLs, standalone executable)
+<!-- TODO add lua to dependencies here -->
 5. Install dependencies: `pacman -S mingw-w64-x86_64-{cmake,SDL2,toolchain,qt5-static,libarchive,zstd}`
 6. Compile:
    ```bash
@@ -84,7 +89,7 @@ If everything went well, melonDS should now be in the `build` folder.
 
 ### macOS
 1. Install the [Homebrew Package Manager](https://brew.sh)
-2. Install dependencies: `brew install git pkg-config cmake sdl2 qt@6 libarchive zstd`
+2. Install dependencies: `brew install git pkg-config cmake sdl2 qt@6 libarchive lua zstd`
 3. Download the melonDS repository and prepare:
    ```zsh
    git clone https://github.com/melonDS-emu/melonDS

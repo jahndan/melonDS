@@ -19,6 +19,7 @@
 #ifndef EMUINSTANCE_H
 #define EMUINSTANCE_H
 
+#include <vector>
 #include <SDL2/SDL.h>
 
 #include "NDS.h"
@@ -123,6 +124,9 @@ public:
 
     static const char* buttonNames[12];
     static const char* hotkeyNames[HK_MAX];
+
+    // std::vector<int> Keystrokes; // making input available to lua scripts
+    // TODO does each instance require a corresponding scripting engine?
 
     void inputInit();
     void inputDeInit();

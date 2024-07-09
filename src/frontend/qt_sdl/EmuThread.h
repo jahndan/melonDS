@@ -130,6 +130,12 @@ signals:
 
     void syncVolumeLevel();
 
+    void signalLuaPrint(const QString &);
+    void signalLuaClearConsole();
+    // TODO: lua script save states?
+    // void signalLuaSaveState(const QString &);
+    // void signalLuaLoadState(const QString &);
+
 private:
     void handleMessages();
 

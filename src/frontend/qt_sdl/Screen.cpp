@@ -43,6 +43,8 @@
 #include "Platform.h"
 #include "Config.h"
 
+#include "LuaMain.h"
+
 #include "main_shaders.h"
 #include "OSD_shaders.h"
 #include "font.h"
@@ -117,8 +119,9 @@ void ScreenPanel::setMouseHide(bool enable, int delay)
 
 void ScreenPanel::setupScreenLayout()
 {
-    int w = width();
-    int h = height();
+    // TODO is this padding necessary?
+    int w = width() - LuaScript::RightPadding + LuaScript::LeftPadding;
+    int h = height() - LuaScript::BottomPadding + LuaScript::TopPadding;
 
     int sizing = screenSizing;
     if (sizing == screenSizing_Auto) sizing = autoScreenSizing;
@@ -160,40 +163,43 @@ QSize ScreenPanel::screenGetMinSize(int factor = 1)
 
     int w = 256 * factor;
     int h = 192 * factor;
+    // TODO is this padding necessary?
+    int wp = LuaScript::RightPadding + LuaScript::LeftPadding;
+    int hp = LuaScript::BottomPadding + LuaScript::TopPadding;
 
     if (screenSizing == screenSizing_TopOnly
         || screenSizing == screenSizing_BotOnly)
     {
-        return QSize(w, h);
+        return QSize(w + wp, h + hp);
     }
 
     if (screenLayout == screenLayout_Natural)
     {
         if (isHori)
-            return QSize(h+gap+h, w);
+            return QSize(h + gap + h + wp, w + hp);
         else
-            return QSize(w, h+gap+h);
+            return QSize(w + wp, h + gap + h + hp);
     }
     else if (screenLayout == screenLayout_Vertical)
     {
         if (isHori)
-            return QSize(h, w+gap+w);
+            return QSize(h + wp, w + gap + w + hp);
         else
-            return QSize(w, h+gap+h);
+            return QSize(w + wp, h + gap + h + hp);
     }
     else if (screenLayout == screenLayout_Horizontal)
     {
         if (isHori)
-            return QSize(h+gap+h, w);
+            return QSize(h + gap + h + wp, w + hp);
         else
-            return QSize(w+gap+w, h);
+            return QSize(w + gap + w + wp, h + hp);
     }
     else // hybrid
     {
         if (isHori)
-            return QSize(h+gap+h, 3*w + (int)ceil((4*gap) / 3.0));
+            return QSize(h + gap + h + wp, hp + 3 * w + (int)ceil((4 * gap) / 3.0));
         else
-            return QSize(3*w + (int)ceil((4*gap) / 3.0), h+gap+h);
+            return QSize(wp + 3 * w + (int)ceil((4 * gap) / 3.0), h + gap + h + hp);
     }
 }
 
@@ -695,6 +701,15 @@ void ScreenPanelNative::paintEvent(QPaintEvent* event)
 
         painter.resetTransform();
 
+        // TODO verify this works (placed here because it roughly corresponds to the old one)
+        for (auto lo = LuaScript::LuaOverlays.begin(); lo != LuaScript::LuaOverlays.end();)
+        {
+            LuaScript::OverlayCanvas &overlay = *lo;
+            if (overlay.isActive)
+                painter.drawImage(overlay.rectangle, *overlay.displayBuffer);
+            lo++;
+        }
+
         for (auto it = osdItems.begin(); it != osdItems.end(); )
         {
             OSDItem& item = *it;
@@ -1015,6 +1030,38 @@ void ScreenPanelGL::drawScreenGL()
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+        // TODO verify this works (placed here because it roughly corresponds to the old one)
+        for (auto lo = LuaScript::LuaOverlays.begin(); lo != LuaScript::LuaOverlays.end();)
+        {
+            LuaScript::OverlayCanvas &overlay = *lo;
+            if (!overlay.GLTextureLoaded)
+            {
+                glGenTextures(1, &overlay.GLTexture);
+                glBindTexture(GL_TEXTURE_2D, overlay.GLTexture);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, overlay.rectangle.width(), overlay.rectangle.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, overlay.displayBuffer->bits());
+                overlay.GLTextureLoaded = true;
+            }
+            if (overlay.flipped)
+            {
+                glBindTexture(GL_TEXTURE_2D, overlay.GLTexture);
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, overlay.rectangle.width(), overlay.rectangle.height(), GL_RGBA, GL_UNSIGNED_BYTE, overlay.displayBuffer->bits());
+                overlay.flipped = false;
+            }
+            // only active overlays get drawn. (textures are still updated though)
+            if (overlay.isActive)
+            {
+                glBindTexture(GL_TEXTURE_2D, overlay.GLTexture);
+                glUniform2i(osdPosULoc, overlay.rectangle.left(), overlay.rectangle.top());
+                glUniform2i(osdSizeULoc, overlay.rectangle.width(), overlay.rectangle.height());
+                glDrawArrays(GL_TRIANGLES, 0, 2 * 3);
+            }
+            lo++;
+        }
 
         for (auto it = osdItems.begin(); it != osdItems.end(); )
         {

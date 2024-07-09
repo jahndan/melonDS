@@ -54,6 +54,8 @@
 
 #include "Savestate.h"
 
+#include "LuaMain.h"
+
 #include "EmuInstance.h"
 
 using namespace melonDS;
@@ -436,6 +438,10 @@ void EmuThread::run()
                 emuInstance->drawScreenGL();
             }
         }
+
+        // handle Lua scripting stuff (not sure if/where this should go in this loop)
+        LuaScript::createLuaState();
+        LuaScript::luaUpdate(); // run a script's _Update() function
 
         handleMessages();
     }
